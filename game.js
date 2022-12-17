@@ -45,25 +45,27 @@ class Board {
 
     mergeLeft() {
         for (let row = 0 ; row < 4 ; row++) {
-            for (let column = 0 ; column < 4 ; column++) {
+            for (let column = 0 ; column < 3 ; column++) {
                 if (this.board[row][column] === this.board[row][column + 1]) {
                     this.board[row][column] *= 2
                     for (let c = column + 1 ; c < 3 ; c++) {
                         this.board[row][c] = this.board[row][c + 1]
                     }
+                    this.board[row][3] = 0
                 }
             }
         }
     }
 
     mergeDown() {
-        for (let row = 0 ; row < 4 ; row++) {
-            for (let column = 0 ; column < 4 ; column++) {
-                if (this.board[row][column] === this.board[row][column + 1]) {
+        for (let column = 0 ; column < 4 ; column++) {
+            for (let row = 3 ; row > 0 ; row--) {
+                if (this.board[row][column] === this.board[row - 1][column]) {
                     this.board[row][column] *= 2
-                    for (let c = column + 1 ; c < 3 ; c++) {
-                        this.board[row][c] = this.board[row][c + 1]
+                    for (let r = row - 1 ; r > 0 ; r--) {
+                        this.board[r][column] = this.board[r - 1][column]
                     }
+                    this.board[0][column] = 0
                 }
             }
         }
@@ -71,25 +73,27 @@ class Board {
 
     mergeRight() {
         for (let row = 0 ; row < 4 ; row++) {
-            for (let column = 0 ; column < 4 ; column++) {
-                if (this.board[row][column] === this.board[row][column + 1]) {
+            for (let column = 3 ; column > 0 ; column--) {
+                if (this.board[row][column] === this.board[row][column - 1]) {
                     this.board[row][column] *= 2
-                    for (let c = column + 1 ; c < 3 ; c++) {
-                        this.board[row][c] = this.board[row][c + 1]
+                    for (let c = column - 1 ; c > 0 ; c--) {
+                        this.board[row][c] = this.board[row][c - 1]
                     }
+                    this.board[row][0] = 0
                 }
             }
         }
     }
 
     mergeUp() {
-        for (let row = 0 ; row < 4 ; row++) {
-            for (let column = 0 ; column < 4 ; column++) {
-                if (this.board[row][column] === this.board[row][column + 1]) {
+        for (let column = 0 ; column < 4 ; column++) {
+            for (let row = 0 ; row < 3 ; row++) {
+                if (this.board[row][column] === this.board[row + 1][column]) {
                     this.board[row][column] *= 2
-                    for (let c = column + 1 ; c < 3 ; c++) {
-                        this.board[row][c] = this.board[row][c + 1]
+                    for (let r = row + 1 ; r < 3 ; r++) {
+                        this.board[r][column] = this.board[r + 1][column]
                     }
+                    this.board[3][column] = 0
                 }
             }
         }
@@ -107,11 +111,10 @@ class Board {
                     } else if (direction === 2) {
                         newPosition = [i, 3 - this.countTilesRight([i, j])]
                     } else if (direction === 1) {
-                        newPosition = [3 - this.countTilesBelow([i, j]), i]
+                        newPosition = [3 - this.countTilesBelow([i, j]), j]
                     } else if (direction === 3) {
-                        newPosition = [this.countTilesAbove([i, j]), i]
+                        newPosition = [this.countTilesAbove([i, j]), j]
                     }
-                    console.log(newPosition)
                     newBoard[newPosition[0]][newPosition[1]] = this.board[i][j]
                 }
             }
@@ -135,6 +138,9 @@ class Board {
 }
 
 board = new Board()
-board.board[0][1] = 2
-board.board[0][2] = 2
-board.board[0][3] = 4
+board.board = [
+    [0, 2, 2, 4], 
+    [2, 2, 2, 2], 
+    [4, 2, 2, 8], 
+    [2, 4, 8, 4]
+]
