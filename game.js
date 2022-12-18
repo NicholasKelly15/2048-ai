@@ -1,6 +1,7 @@
 class Board {
     constructor() {
         this.board = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+        this.tile_container = document.getElementsByClassName("tile-container")[0]
     }
 
     countTilesLeft(position) {
@@ -134,6 +135,32 @@ class Board {
 
     addRandomTile() {
 
+    }
+
+    clearHTMLBoard() {
+        let tile_container = document.getElementsByClassName("tile-container")[0]
+        tile_container.innerHTML = ""
+    }
+
+    printTileAtPosition(position, tileNumber) {
+        let tile = document.createElement("div")
+        let numberClass = 'tile-' + tileNumber
+        let positionClass = 'tile-pos-' + position[0] + '-' + position[1]
+        tile.setAttribute('class', 'tile ' + numberClass + ' ' + positionClass)
+        tile.textContent = tileNumber
+        let tile_container = document.getElementsByClassName("tile-container")[0]
+        tile_container.appendChild(tile)
+    }
+
+    printHTML() {
+        this.clearHTMLBoard()
+        for (let i = 0 ; i < 4 ; i++) {
+            for (let j = 0 ; j < 4 ; j++) {
+                if (this.board[i][j] !== 0) {
+                    this.printTileAtPosition([i, j], this.board[i][j])
+                }
+            }
+        }
     }
 }
 
