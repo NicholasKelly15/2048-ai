@@ -282,14 +282,20 @@ class Board {
 }
 
 
+function start() {
+    board = new Board()
+    board.board = [
+        [0, 2, 2, 4], 
+        [2, 2, 2, 2], 
+        [4, 2, 2, 8], 
+        [2, 4, 8, 4]
+    ]
+    board.printHTML()
+}
 
-board = new Board()
-board.board = [
-    [0, 2, 2, 4], 
-    [2, 2, 2, 2], 
-    [4, 2, 2, 8], 
-    [2, 4, 8, 4]
-]
+setTimeout(start, 100)
+
+
 
 
 function onClick(event) {
