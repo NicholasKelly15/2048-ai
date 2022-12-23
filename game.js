@@ -1,7 +1,20 @@
+function randomListElement(lst) {
+    return lst[Math.floor(Math.random() * lst.length)]
+}
+
+
 class Board {
     constructor() {
         this.board = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
         this.tile_container = document.getElementsByClassName("tile-container")[0]
+        this.score = 0
+    }
+
+    makeBoardCopy() {
+        let board = new Board()
+        board.board = this.board
+        board.score = this.score
+        return board
     }
 
     countTilesLeft(position) {
@@ -49,6 +62,7 @@ class Board {
             for (let column = 0 ; column < 3 ; column++) {
                 if (this.board[row][column] === this.board[row][column + 1]) {
                     this.board[row][column] *= 2
+                    this.score += this.board[row][column]
                     for (let c = column + 1 ; c < 3 ; c++) {
                         this.board[row][c] = this.board[row][c + 1]
                     }
@@ -63,6 +77,7 @@ class Board {
             for (let row = 3 ; row > 0 ; row--) {
                 if (this.board[row][column] === this.board[row - 1][column]) {
                     this.board[row][column] *= 2
+                    this.score += this.board[row][column]
                     for (let r = row - 1 ; r > 0 ; r--) {
                         this.board[r][column] = this.board[r - 1][column]
                     }
@@ -77,6 +92,7 @@ class Board {
             for (let column = 3 ; column > 0 ; column--) {
                 if (this.board[row][column] === this.board[row][column - 1]) {
                     this.board[row][column] *= 2
+                    this.score += this.board[row][column]
                     for (let c = column - 1 ; c > 0 ; c--) {
                         this.board[row][c] = this.board[row][c - 1]
                     }
@@ -91,6 +107,7 @@ class Board {
             for (let row = 0 ; row < 3 ; row++) {
                 if (this.board[row][column] === this.board[row + 1][column]) {
                     this.board[row][column] *= 2
+                    this.score += this.board[row][column]
                     for (let r = row + 1 ; r < 3 ; r++) {
                         this.board[r][column] = this.board[r + 1][column]
                     }
@@ -105,7 +122,6 @@ class Board {
             let emptyTileLeft = false
             for (let column = 0 ; column < 4 ; column ++) {
                 if (column < 3 && this.board[row][column] !== 0 && this.board[row][column] === this.board[row][column + 1]) {
-                    console.log(row, column)
                     return true
                 }
                 if (emptyTileLeft && this.board[row][column] !== 0) {
@@ -124,7 +140,6 @@ class Board {
             let emptyRightTile = false
             for (let column = 3 ; column >= 0 ; column--) {
                 if (column > 0 && this.board[row][column] !== 0 && this.board[row][column] === this.board[row][column - 1]) {
-                    console.log(row, column)
                     return true
                 }
                 if (emptyRightTile && this.board[row][column] !== 0) {
@@ -143,7 +158,6 @@ class Board {
             let emptyDownTile = false
             for (let row = 3 ; row >= 0 ; row--) {
                 if (row > 0 && this.board[row][column] !== 0 && this.board[row][column] === this.board[row - 1][column]) {
-                    console.log(row, column)
                     return true
                 }
                 if (emptyDownTile && this.board[row][column] !== 0) {
@@ -162,7 +176,6 @@ class Board {
             let emptyUpTile = false
             for (let row = 0 ; row < 4 ; row++) {
                 if (row < 3 && this.board[row][column] !== 0 && this.board[row][column] === this.board[row + 1][column]) {
-                    console.log(row, column)
                     return true
                 }
                 if (emptyUpTile && this.board[row][column] !== 0) {
@@ -194,8 +207,16 @@ class Board {
         return possibleMoves
     }
 
-    // direction: 0 = left, 1 = down, 2 = right, 3 = up
     move(direction) {
+        this.movePlayer(direction)
+        this.addRandomTile()
+        if (this.getPossibleMoves().length === 0) {
+            return -1
+        }
+    }
+
+    // direction: 0 = left, 1 = down, 2 = right, 3 = up
+    movePlayer(direction) {
         let possibleMoves = this.getPossibleMoves()
         if (possibleMoves.includes(direction)) {
             let newBoard = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
@@ -226,15 +247,10 @@ class Board {
             } else if (direction === 3) {
                 this.mergeUp()
             }
-            this.addRandomTile()
-            if (this.getPossibleMoves().length === 0) {
-                this.printHTML()
-                alert("You Lost :(")
-            }
         }
     }
 
-    addRandomTile() {
+    getEmptyTiles() {
         let emptyTiles = []
         for (let i = 0 ; i < 4 ; i++) {
             for (let j = 0 ; j < 4 ; j++) {
@@ -243,7 +259,11 @@ class Board {
                 }
             }
         }
+        return emptyTiles
+    }
 
+    addRandomTile() {
+        let emptyTiles = this.getEmptyTiles()
         if (emptyTiles.length > 0) {
             let randomTile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)]
             if (Math.random() > 0.9) {
@@ -252,6 +272,91 @@ class Board {
                 this.board[randomTile[0]][randomTile[1]] = 2
             }
         }
+    }
+
+    makeRandomMovesUntilGameEnd() {
+        while (true) {
+            let moves = this.getPossibleMoves()
+            if (moves.length === 0 || this.move(randomListElement(moves)) === -1) {
+                return this.score
+            }
+        }
+    }
+
+    getBestMoveRandomStrategy() {
+        let moves = this.getPossibleMoves()
+        let bestMove = -1
+        let bestScore = -1
+        for (let i = 0 ; i < moves.length ; i++) {
+            let averageScore = 0
+            for (let j = 0 ; j < randomRunsPerMove ; j++) {
+                let testingBoard = this.makeBoardCopy()
+                testingBoard.move(moves[i])
+                averageScore += testingBoard.makeRandomMovesUntilGameEnd()
+            }
+            if (averageScore > bestScore) {
+                bestMove = moves[i]
+                bestScore = averageScore
+            }
+        }
+        return bestMove
+    }
+
+    getHeuristicValue() {
+        let value = 0
+        for (let i = 0 ; i < 4 ; i++) {
+            for (let j = 0 ; j < 4 ; j++) {
+                value += boardSpaceValues1[i][j] * this.board[i][j]
+            }
+        }
+        return value
+    }
+
+    expectiminimax(depth, aiTurn) {
+        if (this.getPossibleMoves().length === 0 || depth === 0) {
+            return this.getHeuristicValue()
+        }
+        if (!aiTurn) {
+            let a = -Number.MIN_VALUE
+            let moves = this.getPossibleMoves()
+            for (let i = 0 ; i < moves.length ; i++) {
+                let boardCopy = this.makeBoardCopy()
+                boardCopy.movePlayer(moves[i])
+                a = Math.max(a, boardCopy.expectiminimax(depth - 1, true))
+            }
+            return a
+        } else {
+            let a = 0
+            let possiblePiecePlacements = this.getEmptyTiles()
+            for (let i = 0 ; i < possiblePiecePlacements.length ; i++) {
+                let boardCopy = this.makeBoardCopy()
+                boardCopy.board[possiblePiecePlacements[i][0]][possiblePiecePlacements[i][1]] = 2
+                a += (0.9 / possiblePiecePlacements.length) * boardCopy.expectiminimax(depth - 1, false)
+                // a = Math.min(a, boardCopy.expectiminimax(depth - 1, false))
+
+                boardCopy = this.makeBoardCopy()
+                boardCopy.board[possiblePiecePlacements[i][0]][possiblePiecePlacements[i][1]] = 4
+                // a = Math.min(a, boardCopy.expectiminimax(depth - 1, false))
+                a += (0.1 / possiblePiecePlacements.length) * boardCopy.expectiminimax(depth - 1, false)
+            }
+            return a
+        }
+    }
+
+    getBestMoveExpectimax() {
+        let moves = this.getPossibleMoves()
+        let bestMove = -1
+        let bestMoveScore = -Number.MIN_VALUE
+        for (let i = 0 ; i < moves.length ; i++) {
+            let boardCopy = this.makeBoardCopy()
+            boardCopy.movePlayer(moves[i])
+            let score = boardCopy.expectiminimax(expectiminimaxDepth, true)
+            if (score > bestMoveScore) {
+                bestMoveScore = score
+                bestMove = moves[i]
+            }
+        }
+        return bestMove
     }
 
     clearHTMLBoard() {
@@ -281,16 +386,26 @@ class Board {
     }
 }
 
+function runAI(board) {
+    if (board.move(board.getBestMoveExpectimax()) === -1) {
+        
+    } else {
+        board.printHTML()
+        setTimeout(runAI, 0, board)
+    }
+}
+
 
 function start() {
     board = new Board()
     board.board = [
-        [0, 2, 2, 4], 
-        [2, 2, 2, 2], 
-        [4, 2, 2, 8], 
-        [2, 4, 8, 4]
+        [2, 0, 0, 0], 
+        [0, 0, 2, 0], 
+        [0, 0, 0, 0], 
+        [0, 0, 0, 0]
     ]
     board.printHTML()
+    runAI(board)
 }
 
 setTimeout(start, 100)
@@ -314,4 +429,4 @@ function onClick(event) {
     }
 }
 
-document.addEventListener('keydown', onClick)
+// document.addEventListener('keydown', onClick)
