@@ -15,7 +15,7 @@ h1.title {
 .center-game-container {
     width: 500px;
     margin: auto;
-    margin-top: 25px;
+    margin-top: 25;
 
 }
 
@@ -29,6 +29,52 @@ h1.title {
     box-sizing: border-box;
 
     background-color: #bbada0;
+}
+
+.control-bar {
+    padding-bottom: 0px;
+    line-height: 1.2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top-bar-game-details {
+    float: left;
+}
+
+.top-bar-buttons-container {
+    float: right;
+}
+
+.top-bar-button-1 {
+    border-radius: 3px;
+    background-color: #8f7a66;
+    color: #f9f6f2;
+    text-align: center;
+    width: 75px;
+    height: 40px;
+    font-weight: bold;
+    border: none;
+}
+
+.top-bar-button-2 {
+    border-radius: 3px;
+    background-color: #8f7a66;
+    color: #f9f6f2;
+    text-align: center;
+    width: 75px;
+    height: 40px;
+    font-weight: bold;
+    border: none;
+}
+
+.top-bar-button:hover {
+    background-color: #756555;
+}
+
+.top-bar-button:active {
+    background-color: #908575;
 }
 
 .grid-container {

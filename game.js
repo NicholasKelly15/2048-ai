@@ -6,8 +6,14 @@ function randomListElement(lst) {
 class Board {
     constructor() {
         this.board = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+        this.board[Math.floor(Math.random() * 4)][Math.floor(Math.random() * 4)] = 2
+        let emptyTiles = this.getEmptyTiles()
+        let emptyTile = randomListElement(emptyTiles)
+        this.board[emptyTile[0]][emptyTile[1]] = 2
         this.tile_container = document.getElementsByClassName("tile-container")[0]
         this.score = 0
+        this.reset = false
+        this.paused = false
     }
 
     makeBoardCopy() {
@@ -309,11 +315,14 @@ class Board {
                 value += boardSpaceValues1[i][j] * this.board[i][j]
             }
         }
+        value = value + this.getEmptyTiles().length
         return value
     }
 
     expectiminimax(depth, aiTurn) {
-        if (this.getPossibleMoves().length === 0 || depth === 0) {
+        if (this.getPossibleMoves().length === 0) {
+            return 0
+        } else if (depth === 0) {
             return this.getHeuristicValue()
         }
         if (!aiTurn) {
@@ -386,9 +395,15 @@ class Board {
     }
 }
 
+
+let board = new Board()
+
+
 function runAI(board) {
     if (board.move(board.getBestMoveExpectimax()) === -1) {
         
+    } else if (board.reset) {
+        board.reset = true
     } else {
         board.printHTML()
         setTimeout(runAI, 0, board)
@@ -398,35 +413,41 @@ function runAI(board) {
 
 function start() {
     board = new Board()
-    board.board = [
-        [2, 0, 0, 0], 
-        [0, 0, 2, 0], 
-        [0, 0, 0, 0], 
-        [0, 0, 0, 0]
-    ]
     board.printHTML()
-    runAI(board)
 }
+
+
+function onResetButtonClick() {
+    board.reset = true
+    board = new Board()
+    board.printHTML()
+}
+
+
+function onPauseButtonClick() {
+
+}
+
 
 setTimeout(start, 100)
 
 
 
-
-function onClick(event) {
-    if (event.keyCode == 87) { // up
-        board.move(3)
-        board.printHTML()
-    } else if (event.keyCode === 65) { // left
-        board.move(0)
-        board.printHTML()
-    } else if (event.keyCode === 83) { // down
-        board.move(1)
-        board.printHTML()
-    } else if (event.keyCode === 68) { // right
-        board.move(2)
-        board.printHTML()
-    }
-}
+// For keyboard controlling of the board
+// function onClick(event) {
+//     if (event.keyCode == 87) { // up
+//         board.move(3)
+//         board.printHTML()
+//     } else if (event.keyCode === 65) { // left
+//         board.move(0)
+//         board.printHTML()
+//     } else if (event.keyCode === 83) { // down
+//         board.move(1)
+//         board.printHTML()
+//     } else if (event.keyCode === 68) { // right
+//         board.move(2)
+//         board.printHTML()
+//     }
+// }
 
 // document.addEventListener('keydown', onClick)
